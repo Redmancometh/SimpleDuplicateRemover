@@ -46,8 +46,7 @@ public class DupeWipe {
 
 			} catch (IOException e) {
 				if (e instanceof AccessDeniedException) {
-					System.out.println("Access denied (INNER!) are you fucking kidding me?");
-					System.out.println("Path: " + path);
+					System.out.println("Access Denied to Delete Path: " + path);
 				} else
 					e.printStackTrace();
 			}
