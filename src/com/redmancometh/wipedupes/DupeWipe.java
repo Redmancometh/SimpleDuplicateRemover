@@ -1,6 +1,7 @@
 package com.redmancometh.wipedupes;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.AccessDeniedException;
@@ -15,16 +16,24 @@ public class DupeWipe {
 		File f = new File("cache");
 		Path root = Paths.get(f.getAbsolutePath());
 		try {
-			Files.walk(root).parallel().filter((newPath) -> !Files.isDirectory(newPath)).forEach((path) -> {
+			File f2 = new File("cache-nd");
+			if (!f2.exists())
+				f2.mkdirs();
+			Files.walk(root).filter((newPath) -> !Files.isDirectory(newPath)).forEach((path) -> {
 				try (InputStream in = Files.newInputStream(path)) {
+
 					System.out.println(path);
 					checkDuplicatesFor(path, DigestUtils.md5Hex(in));
+					Files.move(path, Paths.get(new File("cache-nd/" + path.getFileName()).getAbsolutePath()));
 				} catch (IOException e) {
 					if (e instanceof AccessDeniedException) {
 						System.out.println("Access denied are you fucking kidding me?");
 						System.out.println("Path: " + path);
-					} else
+					} else if (e instanceof FileNotFoundException) {
+
+					} else {
 						e.printStackTrace();
+					}
 				}
 
 			});
@@ -47,8 +56,11 @@ public class DupeWipe {
 			} catch (IOException e) {
 				if (e instanceof AccessDeniedException) {
 					System.out.println("Access Denied to Delete Path: " + path);
-				} else
+				} else if (e instanceof FileNotFoundException) {
+
+				} else {
 					e.printStackTrace();
+				}
 			}
 		});
 	}
